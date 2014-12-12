@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <cstdio>
 
+#include <shaders.h>
+
 // bool init()
 // {
 //   if(SDL_Init(SDL_INIT_EVERYTHING) <0)
@@ -21,16 +23,22 @@ void main_loop(GLFWwindow* w)
     {
       -1.0f, -1.0f, 0.0f,
       1.0f, -1.0f, 0.0f,
-      0.0f, 1.0f, 0.0f,
+      0.0f,  1.0f, 0.0f,
     };
 
   GLuint vertexBuffer;
   glGenBuffers(1, &vertexBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  
+
+  GLuint programID = LoadShaders("SimpleVertexShader.glsl", "SimpleFragmentShader.glsl");
+
+  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
   do
     {
+      glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+      glUseProgram(programID);
+      
       glEnableVertexAttribArray(0);
       glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
       glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -47,6 +55,8 @@ void main_loop(GLFWwindow* w)
 
 int main(int argc, char** argv)
 {
+  system("pwd");
+  
   if(!glfwInit())
     {
       printf("Failed to initialize GLFW\n");
