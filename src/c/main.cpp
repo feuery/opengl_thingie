@@ -5,11 +5,7 @@
 
 #include <shaders.h>
 
-// bool init()
-// {
-//   if(SDL_Init(SDL_INIT_EVERYTHING) <0)
-//     return false;
-// }
+//Jatkaa hän ystävällisesti tästä http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/#The_Projection_matrix
 
 using namespace glm;
 
