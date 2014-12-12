@@ -11,6 +11,40 @@
 
 using namespace glm;
 
+void main_loop(GLFWwindow* w)
+{
+  GLuint VertexArrayID;
+  glGenVertexArrays(1, &VertexArrayID);
+  glBindVertexArray(VertexArrayID);
+
+  static const GLfloat vertices[] =
+    {
+      -1.0f, -1.0f, 0.0f,
+      1.0f, -1.0f, 0.0f,
+      0.0f, 1.0f, 0.0f,
+    };
+
+  GLuint vertexBuffer;
+  glGenBuffers(1, &vertexBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  
+  do
+    {
+      glEnableVertexAttribArray(0);
+      glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+      // Starting from vertex 0; 3 vertices total -> 1 triang
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+
+      glDisableVertexAttribArray(0);
+      
+      glfwSwapBuffers(w);
+      glfwPollEvents();
+    } while(glfwGetKey(w, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(w) == 0);
+}
+
 int main(int argc, char** argv)
 {
   if(!glfwInit())
@@ -45,11 +79,7 @@ int main(int argc, char** argv)
 
   glfwSetInputMode(w, GLFW_STICKY_KEYS, GL_TRUE);
 
-  do
-    {
-      glfwSwapBuffers(w);
-      glfwPollEvents();
-    } while(glfwGetKey(w, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(w) == 0);
+  main_loop(w);
   
   return 0;
 }
