@@ -1,11 +1,15 @@
 #ifndef SHADERS_H
 #define SHADERS_H
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include <main.h>
 
-
-GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path);
+enum SHADER_TYPE {
+  VERTEX,
+  FRAGMENT
+};
+  
+GLuint LoadShaders(const char * vertex_file_path, SHADER_TYPE s);
+GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader);
 
 #endif //SHADERS_H
+

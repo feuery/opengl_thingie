@@ -1,91 +1,113 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <cstdio>
-
+//http://www.learnopengl.com/#!Getting-started/Hello-Triangle
+// Vertex array object
+#include <main.h>
+#include <keyboard_handler.h>
 #include <shaders.h>
 
-//Jatkaa hän ystävällisesti tästä http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/#The_Projection_matrix
-
-using namespace glm;
-
-void main_loop(GLFWwindow* w)
+//Does shit and returns useful vertex array object handle
+GLuint generateTriangle(GLfloat x1, GLfloat y1,GLfloat x2, GLfloat y2,GLfloat x3, GLfloat y3)
 {
-  GLuint VertexArrayID;
-  glGenVertexArrays(1, &VertexArrayID);
-  glBindVertexArray(VertexArrayID);
+  GLfloat vertices[] = {
+    x1, y1, 0.0f,
+    x2, y2, 0.0f,
+    x3, y3, 0.0f
+  };
 
-  static const GLfloat vertices[] =
-    {
-      -1.0f, -1.0f, 0.0f,
-      1.0f, -1.0f, 0.0f,
-      0.0f,  1.0f, 0.0f,
-    };
+  GLuint VBO;
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-  GLuint vertexBuffer;
-  glGenBuffers(1, &vertexBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  GLuint programID = LoadShaders("SimpleVertexShader.glsl", "SimpleFragmentShader.glsl");
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), (GLvoid*)0);
+  glEnableVertexAttribArray(0);
 
-  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-  do
-    {
-      glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-      glUseProgram(programID);
-      
-      glEnableVertexAttribArray(0);
-      glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+  GLuint VAO;
+  glGenVertexArrays(1, &VAO);
 
-      // Starting from vertex 0; 3 vertices total -> 1 triang
-      glDrawArrays(GL_TRIANGLES, 0, 3);
+  glBindVertexArray(VAO); {
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), (GLvoid*) 0);
+    glEnableVertexAttribArray(0);
+  }
+  glBindVertexArray(0);
 
-      glDisableVertexAttribArray(0);
-      
-      glfwSwapBuffers(w);
-      glfwPollEvents();
-    } while(glfwGetKey(w, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(w) == 0);
+  return VAO;
 }
 
-int main(int argc, char** argv)
+void renderTriangle(GLuint VAO, GLuint shaderProgram)
 {
-  system("pwd");
-  
-  if(!glfwInit())
-    {
-      printf("Failed to initialize GLFW\n");
-      return -1;
-    }
+    glUseProgram (shaderProgram);
+    glBindVertexArray(VAO);
 
-  glfwWindowHint(GLFW_SAMPLES, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+    glBindVertexArray(0);
+}
+
+int main()
+{
+  //init shit and set the system to use corret ogl-version
+  glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-  GLFWwindow* w;
-  w = glfwCreateWindow(1024, 768, "Hello world!", NULL, NULL);
+  //Our window <3
+  GLFWwindow * w = glfwCreateWindow(800, 600, "MOI MAAILMA", nullptr, nullptr);
 
-  if(!w)
-    {
-      printf("Making of GLFW window failed");
-      glfwTerminate();
-      return -1;
-    }
+  if(!w) {
+    printf("Initing GLFWwindow failed\n");
+    return -1;
+  }
 
+  //prepare glew
   glfwMakeContextCurrent(w);
-  glewExperimental = true;
-  if(glewInit() != GLEW_OK)
-    {
-      printf("Failed to init GLEW");
-      return -1;
-    }
+  glewExperimental = GL_TRUE;
 
-  glfwSetInputMode(w, GLFW_STICKY_KEYS, GL_TRUE);
+  GLenum init_success;
 
-  main_loop(w);
+  //init glew
+  if((init_success = glewInit()) != GLEW_OK) {
+    printf("Initing glew failed: %s\n", glewGetErrorString(init_success));
+    return -1;
+  }
+
+  //How big is the viewport?
+  glViewport(0,0, 800, 600);
+
+  //Keyboard-eventlistener-thingie
+  glfwSetKeyCallback(w, key_callback);
+
+  //Setup the shaders
+  auto vShader = LoadShaders("vertexShader.glsl", VERTEX);
+  auto fShader = LoadShaders("fragmentShader.glsl", FRAGMENT);
   
+  GLuint shaderProgram = (CreateShaderProgram(vShader,
+				    fShader));
+  glDeleteShader(vShader);
+  glDeleteShader(fShader);
+
+  //Tell the system how to read our vertices
+
+  GLuint vao = generateTriangle(-0.5f, 0.2f,
+				0.5f, 0.2f,
+				0.0f, 0.9f);
+  
+  //main-loop <3
+  while(!glfwWindowShouldClose(w)) {
+    glfwPollEvents();
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    renderTriangle(vao, shaderProgram);
+    
+    glfwSwapBuffers(w);
+  }
+
+  glfwTerminate();
   return 0;
 }

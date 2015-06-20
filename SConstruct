@@ -8,7 +8,7 @@ env.ParseConfig('sdl2-config --libs')
 SOURCES = glob.glob('src/c/*.cpp')
 HEADERS = glob.glob('src/headers/*.h')
 
-env.Append(CCFLAGS = ['-g', '-Wall', '-Isrc/headers/'])
+env.Append(CCFLAGS = ['-g', '-std=c++11', '-Wall', '-Isrc/headers/'])
 
 env.Append(LIBS = ['SDL2_ttf', "GL", "GLEW", "libglfw"])
 
