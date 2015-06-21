@@ -87,8 +87,10 @@ void renderTriangle(GLuint VAO, GLuint shaderProgram, bool drawElements=false)
     if(drawElements) {
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
-    else {      
+    else {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       glDrawArrays(GL_TRIANGLES, 0, 3);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     glBindVertexArray(0);
 }
@@ -155,6 +157,7 @@ int main()
 				0.0f, 0.0f);
   
   //main-loop <3
+  
   while(!glfwWindowShouldClose(w)) {
     glfwPollEvents();
 
