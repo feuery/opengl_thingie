@@ -130,12 +130,16 @@ int main()
 
   //Setup the shaders
   auto vShader = LoadShaders("vertexShader.glsl", VERTEX);
-  auto fShader = LoadShaders("fragmentShader.glsl", FRAGMENT);
+  auto fShader = LoadShaders("fragmentShader.glsl", FRAGMENT),
+    triangleFShader = LoadShaders("triangleFragment.glsl", FRAGMENT);
   
-  GLuint shaderProgram = (CreateShaderProgram(vShader,
-				    fShader));
+  GLuint shaderProgram = CreateShaderProgram(vShader,
+				    fShader);
+  GLuint triangleShader = CreateShaderProgram(vShader, triangleFShader);
+  
   glDeleteShader(vShader);
   glDeleteShader(fShader);
+  glDeleteShader(triangleFShader);
 
   //Tell the system how to read our vertices
 
@@ -145,7 +149,10 @@ int main()
     generateRectangle({ 0.5f,  0.5f},
 		      {     0.5f, -0.5f},
 		      {    -0.5f, -0.5f}, 
-		      {    -0.5f,  0.5f});
+		      {    -0.5f,  0.5f}),
+    otherVao = generateTriangle(-1.0f, -1.0f,
+				1.0f, -1.0f,
+				0.0f, 0.0f);
   
   //main-loop <3
   while(!glfwWindowShouldClose(w)) {
@@ -155,6 +162,7 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT);
 
     renderTriangle(vao, shaderProgram, true);
+    renderTriangle(otherVao, triangleShader);
     
     glfwSwapBuffers(w);
 
