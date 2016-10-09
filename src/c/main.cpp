@@ -145,13 +145,14 @@ int main()
 
   //Tell the system how to read our vertices
 
-  GLuint vao = /*generateTriangle(-0.5f, 0.2f,
+  GLuint vao = generateTriangle(-0.5f, 0.2f,
 				0.5f, 0.2f,
-				0.0f, 0.9f); */
-    generateRectangle({ 0.5f,  0.5f},
-		      {     0.5f, -0.5f},
-		      {    -0.5f, -0.5f}, 
-		      {    -0.5f,  0.5f}),
+				0.0f, 0.9f)
+    // generateRectangle({ 0.5f,  0.5f},
+    // 		      {     0.5f, -0.5f},
+    // 		      {    -0.5f, -0.5f}, 
+    // 		      {    -0.5f,  0.5f})
+    ,
     otherVao = generateTriangle(-1.0f, -1.0f,
 				1.0f, -1.0f,
 				0.0f, 0.0f);
@@ -164,7 +165,7 @@ int main()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderTriangle(vao, shaderProgram, true);
+    renderTriangle(vao, shaderProgram);    
     renderTriangle(otherVao, triangleShader);
     
     glfwSwapBuffers(w);
