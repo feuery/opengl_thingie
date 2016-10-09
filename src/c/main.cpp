@@ -1,5 +1,7 @@
 //http://www.learnopengl.com/#!Getting-started/Hello-Triangle
-// neliönpiirto rikkic
+// neliönpiirto rikki
+// Tehään shaderien uudelleenlataus jos joskus viitsitään tehä "oikea" luokkahierarkkia tähän
+
 #include <main.h>
 #include <keyboard_handler.h>
 #include <shaders.h>
@@ -25,8 +27,8 @@ GLuint generateRectangle (Point p1, Point p2, Point p3, Point p4)
   GLuint VBO;
   glGenBuffers(1, &VBO);
 
-  glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), (GLvoid*)0);
-  glEnableVertexAttribArray(0);
+  // glVertexAttribPointer(0,4, GL_FLOAT, GL_FALSE, 4*sizeof(GL_FLOAT), (GLvoid*)0);
+  // glEnableVertexAttribArray(0);
 
   GLuint VAO;
   glGenVertexArrays(1, &VAO);
@@ -60,9 +62,9 @@ GLuint generateTriangle(GLfloat x1, GLfloat y1,GLfloat x2, GLfloat y2,GLfloat x3
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), (GLvoid*)0);
+  // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), (GLvoid*)0);
   glEnableVertexAttribArray(0);
 
   GLuint VAO;
@@ -79,7 +81,7 @@ GLuint generateTriangle(GLfloat x1, GLfloat y1,GLfloat x2, GLfloat y2,GLfloat x3
   return VAO;
 }
 
-void renderTriangle(GLuint VAO, GLuint shaderProgram, bool drawElements=false)
+void renderTriangle(GLuint VAO, GLuint shaderProgram, bool drawElements = false)
 {
     glUseProgram (shaderProgram);
     glBindVertexArray(VAO);
@@ -88,7 +90,8 @@ void renderTriangle(GLuint VAO, GLuint shaderProgram, bool drawElements=false)
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
     else {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      glPolygonMode(GL_FRONT_AND_BACK, // GL_LINE
+		    GL_FILL);
       glDrawArrays(GL_TRIANGLES, 0, 3);
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
@@ -132,30 +135,32 @@ int main()
 
   //Setup the shaders
   auto vShader = LoadShaders("vertexShader.glsl", VERTEX);
-  auto fShader = LoadShaders("fragmentShader.glsl", FRAGMENT),
-    triangleFShader = LoadShaders("triangleFragment.glsl", FRAGMENT);
+  auto fShader = LoadShaders("fragmentShader.glsl", FRAGMENT)// ,
+    // triangleFShader = LoadShaders("triangleFragment.glsl", FRAGMENT)
+    ;
   
   GLuint shaderProgram = CreateShaderProgram(vShader,
 				    fShader);
-  GLuint triangleShader = CreateShaderProgram(vShader, triangleFShader);
+  // GLuint triangleShader = CreateShaderProgram(vShader, triangleFShader);
   
   glDeleteShader(vShader);
   glDeleteShader(fShader);
-  glDeleteShader(triangleFShader);
+  // glDeleteShader(triangleFShader);
 
   //Tell the system how to read our vertices
 
-  GLuint vao = generateTriangle(-0.5f, 0.2f,
-				0.5f, 0.2f,
-				0.0f, 0.9f)
-    // generateRectangle({ 0.5f,  0.5f},
-    // 		      {     0.5f, -0.5f},
-    // 		      {    -0.5f, -0.5f}, 
-    // 		      {    -0.5f,  0.5f})
-    ,
-    otherVao = generateTriangle(-1.0f, -1.0f,
-				1.0f, -1.0f,
-				0.0f, 0.0f);
+  GLuint vao = // generateTriangle(-0.5f, 0.2f,
+    // 				0.5f, 0.2f,
+    // 				0.0f, 0.9f)
+    generateRectangle({ 0.7f,  0.7f},
+    		      {     0.7f, 0.2f},
+    		      {    0.2f, 0.2f}, 
+    		      {    0.2f,  0.7f})
+    // ,
+    // otherVao = generateTriangle(-1.0f, -1.0f,
+    // 				1.0f, -1.0f,
+    // 				0.0f, 0.0f)
+    ;
   
   //main-loop <3
   
@@ -165,8 +170,8 @@ int main()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderTriangle(vao, shaderProgram);    
-    renderTriangle(otherVao, triangleShader);
+    renderTriangle(vao, shaderProgram, true);    
+    // renderTriangle(otherVao, triangleShader);
     
     glfwSwapBuffers(w);
 
