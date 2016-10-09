@@ -1,5 +1,4 @@
-//http://www.learnopengl.com/#!Getting-started/Hello-Triangle
-// neliönpiirto rikki
+//http://www.learnopengl.com/#!Getting-started/Shaders
 // Tehään shaderien uudelleenlataus jos joskus viitsitään tehä "oikea" luokkahierarkkia tähän
 
 #include <main.h>
@@ -81,6 +80,12 @@ GLuint generateTriangle(GLfloat x1, GLfloat y1,GLfloat x2, GLfloat y2,GLfloat x3
   return VAO;
 }
 
+void setColor(GLuint shaderProg, GLfloat R, GLfloat G, GLfloat B) {
+  GLint uniformLoc = glGetUniformLocation(shaderProg, "ourColor");
+  glUseProgram(shaderProg);
+  glUniform4f(uniformLoc, R, G, B, 1.0f);
+}
+
 void renderTriangle(GLuint VAO, GLuint shaderProgram, bool drawElements = false)
 {
     glUseProgram (shaderProgram);
@@ -139,12 +144,12 @@ int main()
     // triangleFShader = LoadShaders("triangleFragment.glsl", FRAGMENT)
     ;
   
-  GLuint shaderProgram = CreateShaderProgram(vShader,
-				    fShader);
+  GLuint shaderProgram = CreateShaderProgram(vShader, fShader);
   // GLuint triangleShader = CreateShaderProgram(vShader, triangleFShader);
   
   glDeleteShader(vShader);
   glDeleteShader(fShader);
+  setColor(shaderProgram, 0.0f, 0.0f, 1.0f);
   // glDeleteShader(triangleFShader);
 
   //Tell the system how to read our vertices
@@ -155,23 +160,26 @@ int main()
     generateRectangle({ 0.7f,  0.7f},
     		      {     0.7f, 0.2f},
     		      {    0.2f, 0.2f}, 
-    		      {    0.2f,  0.7f})
-    // ,
-    // otherVao = generateTriangle(-1.0f, -1.0f,
-    // 				1.0f, -1.0f,
-    // 				0.0f, 0.0f)
-    ;
+    		      {    0.2f,  0.7f}),
+    otherVao = generateRectangle({0.0f, 0.0f},
+				 {0.0f, -0.5f},
+				 {-0.5f, -0.5f},
+				 {-0.5f, 0.0f});
   
   //main-loop <3
   
   while(!glfwWindowShouldClose(w)) {
     glfwPollEvents();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    GLfloat time = glfwGetTime();
+    GLfloat kanava = (sin(time)/2) + 0.5;
+    setColor(shaderProgram, kanava, 0.0f, 0.0f);
+    
     renderTriangle(vao, shaderProgram, true);    
-    // renderTriangle(otherVao, triangleShader);
+    renderTriangle(otherVao, shaderProgram, true);
     
     glfwSwapBuffers(w);
 
