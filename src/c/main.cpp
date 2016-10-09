@@ -6,6 +6,7 @@
 #include <shaders.h>
 
 struct Point { GLfloat x, y; };
+struct RGB { GLfloat r,g,b; };
 
 GLuint generateRectangle (Point p1, Point p2, Point p3, Point p4)
 {
@@ -80,6 +81,37 @@ GLuint generateTriangle(GLfloat x1, GLfloat y1,GLfloat x2, GLfloat y2,GLfloat x3
   return VAO;
 }
 
+GLuint generateTriangleWithColor(GLfloat x1, GLfloat y1,GLfloat x2, GLfloat y2,GLfloat x3, GLfloat y3, RGB c1, RGB c2, RGB c3)
+{
+  GLfloat vertices[] = {
+    x1, y1, 0.0f, c1.r, c1.g, c1.b,
+    x2, y2, 0.0f, c2.r, c2.g, c2.b,
+    x3, y3, 0.0f, c3.r, c3.g, c3.b
+  };
+
+  GLuint VBO;
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  glEnableVertexAttribArray(0);
+
+  GLuint VAO;
+  glGenVertexArrays(1, &VAO);
+
+  glBindVertexArray(VAO); {
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // Position attr
+    glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 6*sizeof(GL_FLOAT), (GLvoid*) 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1,3,GL_FLOAT, GL_FALSE, 6*sizeof(GL_FLOAT), (GLvoid*) (3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+  }
+  glBindVertexArray(0);
+
+  return VAO;
+}
+
 void setColor(GLuint shaderProg, GLfloat R, GLfloat G, GLfloat B) {
   GLint uniformLoc = glGetUniformLocation(shaderProg, "ourColor");
   glUseProgram(shaderProg);
@@ -139,32 +171,33 @@ int main()
   glfwSetKeyCallback(w, key_callback);
 
   //Setup the shaders
-  auto vShader = LoadShaders("vertexShader.glsl", VERTEX);
-  auto fShader = LoadShaders("fragmentShader.glsl", FRAGMENT)// ,
-    // triangleFShader = LoadShaders("triangleFragment.glsl", FRAGMENT)
-    ;
+  auto//  vShader = LoadShaders("vertexShader.glsl", VERTEX),
+    // fShader = LoadShaders("fragmentShader.glsl", FRAGMENT),
+    vShaderWithColor = LoadShaders("vertexWithColor.glsl", VERTEX),
+    fShaderWithColor = LoadShaders("fragmentWithColor.glsl", FRAGMENT);
   
-  GLuint shaderProgram = CreateShaderProgram(vShader, fShader);
+  GLuint // shaderProgram = CreateShaderProgram(vShader, fShader),
+    shaderWithColor = CreateShaderProgram(vShaderWithColor, fShaderWithColor);
+  
   // GLuint triangleShader = CreateShaderProgram(vShader, triangleFShader);
   
-  glDeleteShader(vShader);
-  glDeleteShader(fShader);
-  setColor(shaderProgram, 0.0f, 0.0f, 1.0f);
+  // glDeleteShader(vShader);
+  // glDeleteShader(fShader);
+  glDeleteShader(vShaderWithColor);
+  glDeleteShader(fShaderWithColor);
+  
+  // setColor(shaderProgram, 0.0f, 0.0f, 1.0f);
   // glDeleteShader(triangleFShader);
 
   //Tell the system how to read our vertices
 
-  GLuint vao = // generateTriangle(-0.5f, 0.2f,
-    // 				0.5f, 0.2f,
-    // 				0.0f, 0.9f)
-    generateRectangle({ 0.7f,  0.7f},
-    		      {     0.7f, 0.2f},
-    		      {    0.2f, 0.2f}, 
-    		      {    0.2f,  0.7f}),
-    otherVao = generateRectangle({0.0f, 0.0f},
-				 {0.0f, -0.5f},
-				 {-0.5f, -0.5f},
-				 {-0.5f, 0.0f});
+  GLuint vao = generateTriangle(-0.5f, 0.2f,
+    				0.5f, 0.2f,
+    				0.0f, 0.9f),
+    otherVao = generateTriangleWithColor(0.7, 0.7, 0.7, 0.2, 0.5, 0.5,
+					 {1.0, 0.5, 0.0},
+					 {0.0, 1.0, 0.5},
+					 {0.5, 0.0, 1.0});
   
   //main-loop <3
   
@@ -176,18 +209,18 @@ int main()
 
     GLfloat time = glfwGetTime();
     GLfloat kanava = (sin(time)/2) + 0.5;
-    setColor(shaderProgram, kanava, 0.0f, 0.0f);
+    // setColor(shaderProgram, kanava, 0.0f, 0.0f);
     
-    renderTriangle(vao, shaderProgram, true);    
-    renderTriangle(otherVao, shaderProgram, true);
+    // renderTriangle(vao, shaderProgram);    
+    renderTriangle(otherVao, shaderWithColor);
     
     glfwSwapBuffers(w);
 
     GLenum error;
     const GLubyte* errorStr;
     while((error = glGetError()) != GL_NO_ERROR) {
-      errorStr = gluErrorString(error);
-      printf("We has errors: %s\n", errorStr);
+      // errorStr = gluErrorString(error);
+      // printf("We has errors: %s\n", errorStr);
     }
   }
 
