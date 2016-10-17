@@ -10,6 +10,6 @@ HEADERS = glob.glob('src/headers/*.h')
 
 env.Append(CCFLAGS = ['-g', '-std=c++11', '-Wall', '-Isrc/headers/'])
 
-env.Append(LIBS = ['SDL2_ttf', "GL", "GLEW", "GLU", "libglfw"])
+env.Append(LIBS = ['SDL2_ttf', "GL", "GLEW", "GLU", "libglfw", "SOIL"])
 
 env.Program(target = 'bin/opengljuttu', source = SOURCES)
