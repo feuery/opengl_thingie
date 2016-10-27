@@ -29,4 +29,5 @@
 /src/shaders/fragmentWithColor.glsl~
 /src/shaders/vertexWithColor.glsl~
 /src/c/gl_apu.cpp~
-/src/c/gl_apu.o
+*.o
+*~

@@ -6,13 +6,14 @@
 
 class immutable_obj{
 public:
-  Texture text;
+  GLuint texture;
   GLuint vao_handle;
   GLuint shader_handle;
   Point left_up;
   const char* vertex_shader_path;
   const char* fragment_shader_path;
   bool shader_loaded;
+  int text_w, text_h;
   
   immutable_obj(const char* texture_path,
 		const char* vertex_shader_path,
@@ -24,6 +25,7 @@ public:
   void render();
 
   bool reload_shaders();
+  void setup_texture(const char* filename);
 };
 
 #endif //OBJ_H

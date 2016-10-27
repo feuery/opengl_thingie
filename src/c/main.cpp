@@ -98,9 +98,9 @@ void renderTriangle(GLuint VAO, GLuint shaderProgram, bool drawElements = false)
     glBindVertexArray(0);
 }
 
-int main()
+GLFWwindow* setup_all(int W, int H)
 {
-  //init shit and set the system to use corret ogl-version
+    //init shit and set the system to use corret ogl-version
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -112,7 +112,7 @@ int main()
 
   if(!w) {
     printf("Initing GLFWwindow failed\n");
-    return -1;
+    return nullptr;
   }
 
   //prepare glew
@@ -124,11 +124,11 @@ int main()
   //init glew
   if((init_success = glewInit()) != GLEW_OK) {
     printf("Initing glew failed: %s\n", glewGetErrorString(init_success));
-    return -1;
+    return nullptr;
   }
 
   //How big is the viewport?
-  glViewport(0,0, 800, 600);
+  glViewport(0,0, W, H);
 
   //Keyboard-eventlistener-thingie
   glfwSetKeyCallback(w, key_callback);
@@ -141,22 +141,14 @@ int main()
   // Ylöspäin skaalatessa LINEAR-filtteri
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  //Setup the shaders
-  auto vShaderWithColor = LoadShaders("vertexWithColor.glsl", VERTEX),
-    fShaderWithColor = LoadShaders("fragmentWithColor.glsl", FRAGMENT);
-  
-  GLuint shaderWithColor = CreateShaderProgram(vShaderWithColor, fShaderWithColor);
-  
-  glDeleteShader(vShaderWithColor);
-  glDeleteShader(fShaderWithColor);
-  
-  GLuint vao = generateTriangle(-0.5f, 0.2f,
-    				0.5f, 0.2f,
-    				0.0f, 0.9f),
-    otherVao = generateTriangleWithColor(0.7, 0.7, 0.7, 0.2, 0.5, 0.5,
-					 {1.0, 0.5, 0.0},
-					 {0.0, 1.0, 0.5},
-					 {0.5, 0.0, 1.0});
+  return w;
+}
+
+int main()
+{
+
+  auto w = setup_all(W, H);
+  immutable_obj obj("./assets/png/texture.png", "./vertexShader.glsl", "./fragmentShader.glsl", {0.0f, 0.0f});
   
   //main-loop <3
   
@@ -169,7 +161,7 @@ int main()
     GLfloat time = glfwGetTime();
     GLfloat kanava = (sin(time)/2) + 0.5;
 
-    renderTriangle(otherVao, shaderWithColor);
+    obj.render();
     
     glfwSwapBuffers(w);
 
