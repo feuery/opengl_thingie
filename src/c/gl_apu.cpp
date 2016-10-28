@@ -6,10 +6,10 @@ GLuint generateRectangle (Point p1, Point p2, Point p3, Point p4)
 {
   GLfloat vertices[] = {
     // Positions      // Colors           //Texture coords 
-    p1.x, p1.y, 0.0f, 1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top Right
-    p2.x, p2.y, 0.0f, 0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Bottom right
-    p3.x, p3.y, 0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom left
-    p4.x, p4.y, 0.0f, 1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // Top Left
+    p1.x, p1.y, 0.0f, 1.0f, 0.0f, 0.0f,   1.0f, 0.0f, // Top Right
+    p2.x, p2.y, 0.0f, 0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Bottom right
+    p3.x, p3.y, 0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 1.0f, // Bottom left
+    p4.x, p4.y, 0.0f, 1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // Top Left
   };
 
   GLuint indices[] = {  // Note that we start from 0!
